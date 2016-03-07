@@ -1,5 +1,5 @@
 {
-    "name": "Mon1k/smarty",
+    "name": "mon1k/smarty",
     "type": "library",
     "description": "Smarty - the compiling PHP template engine, fork",
     "keywords": ["templating"],
