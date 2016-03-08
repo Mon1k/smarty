@@ -25,7 +25,8 @@
         "classmap": [
             "Smarty.class.php",
             "Smarty_Compiler.class.php",
-            "Config_File.class.php"
+            "Config_File.class.php",
+            "dsSmarty.php"
         ]
     }
 }
