@@ -15,7 +15,7 @@ class dsSmarty extends Smarty
 	{
 		global $cfg;
 		
-		parent::Smarty();
+		parent::__construct();
 		
 		$this->template_dir = 'template/'.$cfg['style'].'/templates/';
 		$this->compile_dir = 'template/'.$cfg['style'].'/templates_c/';
