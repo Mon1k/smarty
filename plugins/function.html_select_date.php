@@ -26,8 +26,6 @@
  *             dropdown to include given date unless explicitly set (Monte)
  *           - 1.3.4 fix behaviour of 0000-00-00 00:00:00 dates to match that
  *             of 0000-00-00 dates (cybot, boots)
- *
- *            - добавлены атрибуты month_selected, day_selected, year_selected для выделения нужных атрибутов
  * @link http://smarty.php.net/manual/en/language.function.html.select.date.php {html_select_date}
  *      (Smarty online manual)
  * @version 1.3.4
@@ -85,15 +83,8 @@ function smarty_function_html_select_date($params, &$smarty)
     $month_empty     = null;
     $year_empty      = null;
     $extra_attrs     = '';
-    
-    //// поля выбранные по умолчанию
-    $day_selected    = null;
-    $month_selected  = null;
-    $year_selected   = null;
-    
-    
-    foreach ($params as $_key=>$_value) 
-    {
+
+    foreach ($params as $_key=>$_value) {
         switch ($_key) {
             case 'prefix':
             case 'time':
@@ -131,19 +122,6 @@ function smarty_function_html_select_date($params, &$smarty)
             case 'reverse_years':
                 $$_key = (bool)$_value;
                 break;
-            
-            
-            // by Monk    
-            case 'day_selected':
-               $day_selected = $_value;
-            break;
-            case 'month_selected':
-               $month_selected = $_value;
-            break;
-            case 'year_selected':
-               $year_selected = $_value;
-            break;
-                                  
 
             default:
                 if(!is_array($_value)) {
@@ -154,7 +132,7 @@ function smarty_function_html_select_date($params, &$smarty)
                 break;
         }
     }
-    
+
     if (preg_match('!^-\d+$!', $time)) {
         // negative timestamp, use date()
         $time = date('Y-m-d', $time);
@@ -200,65 +178,52 @@ function smarty_function_html_select_date($params, &$smarty)
 
     $html_result = $month_result = $day_result = $year_result = "";
 
-    if ($display_months) 
-    {
+    $field_separator_count = -1;
+    if ($display_months) {
+    	$field_separator_count++;
         $month_names = array();
         $month_values = array();
-        if(isset($month_empty)) 
-        {
+        if(isset($month_empty)) {
             $month_names[''] = $month_empty;
-            $month_values[''] = 0;
+            $month_values[''] = '';
         }
-        
-        
-        $month_string = array(1 => 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь');
-        for ($i = 1; $i <= 12; $i++) 
-        {
-            //$month_names[$i] = strftime($month_format, mktime(0, 0, 0, $i, 1, 2000));
-            $month_names[$i] = $month_string[$i];
-				$month_values[$i] = strftime($month_value_format, mktime(0, 0, 0, $i, 1, 2000));
-            
+        for ($i = 1; $i <= 12; $i++) {
+            $month_names[$i] = strftime($month_format, mktime(0, 0, 0, $i, 1, 2000));
+            $month_values[$i] = strftime($month_value_format, mktime(0, 0, 0, $i, 1, 2000));
         }
 
         $month_result .= '<select name=';
-        if (null !== $field_array)
-        {
+        if (null !== $field_array){
             $month_result .= '"' . $field_array . '[' . $prefix . 'Month]"';
-        } 
-        else 
-        {
+        } else {
             $month_result .= '"' . $prefix . 'Month"';
         }
-        if (null !== $month_size)
-        {
+        if (null !== $month_size){
             $month_result .= ' size="' . $month_size . '"';
         }
-        if (null !== $month_extra)
-        {
+        if (null !== $month_extra){
             $month_result .= ' ' . $month_extra;
         }
-        if (null !== $all_extra)
-        {
+        if (null !== $all_extra){
             $month_result .= ' ' . $all_extra;
         }
         $month_result .= $extra_attrs . '>'."\n";
 
         $month_result .= smarty_function_html_options(array('output'     => $month_names,
                                                             'values'     => $month_values,
-                                                            'selected'   => $month_selected != null ? $month_selected : ((int)$time[1] ? strftime($month_value_format, mktime(0, 0, 0, (int)$time[1], 1, 2000)) : ''),
+                                                            'selected'   => (int)$time[1] ? strftime($month_value_format, mktime(0, 0, 0, (int)$time[1], 1, 2000)) : '',
                                                             'print_result' => false),
                                                       $smarty);
         $month_result .= '</select>';
     }
 
-    if ($display_days) 
-    {
+    if ($display_days) {
+    	$field_separator_count++;
         $days = array();
         if (isset($day_empty)) {
             $days[''] = $day_empty;
-            $day_values[''] = '0';
+            $day_values[''] = '';
         }
-        
         for ($i = 1; $i <= 31; $i++) {
             $days[] = sprintf($day_format, $i);
             $day_values[] = sprintf($day_value_format, $i);
@@ -282,21 +247,20 @@ function smarty_function_html_select_date($params, &$smarty)
         $day_result .= $extra_attrs . '>'."\n";
         $day_result .= smarty_function_html_options(array('output'     => $days,
                                                           'values'     => $day_values,
-                                                          'selected'   => $day_selected != null ? $day_selected : $time[2],
+                                                          'selected'   => $time[2],
                                                           'print_result' => false),
                                                     $smarty);
         $day_result .= '</select>';
     }
 
-    if ($display_years) 
-    {
+    if ($display_years) {
+    	$field_separator_count++;
         if (null !== $field_array){
             $year_name = $field_array . '[' . $prefix . 'Year]';
         } else {
             $year_name = $prefix . 'Year';
         }
-        if ($year_as_text) 
-        {
+        if ($year_as_text) {
             $year_result .= '<input type="text" name="' . $year_name . '" value="' . $time[0] . '" size="4" maxlength="4"';
             if (null !== $all_extra){
                 $year_result .= ' ' . $all_extra;
@@ -305,21 +269,17 @@ function smarty_function_html_select_date($params, &$smarty)
                 $year_result .= ' ' . $year_extra;
             }
             $year_result .= ' />';
-        } 
-        else 
-        {
+        } else {
             $years = range((int)$start_year, (int)$end_year);
-            
             if ($reverse_years) {
                 rsort($years, SORT_NUMERIC);
             } else {
                 sort($years, SORT_NUMERIC);
             }
             $yearvals = $years;
-            if(isset($year_empty)) 
-            {
+            if(isset($year_empty)) {
                 array_unshift($years, $year_empty);
-                array_unshift($yearvals, 0);
+                array_unshift($yearvals, '');
             }
             $year_result .= '<select name="' . $year_name . '"';
             if (null !== $year_size){
@@ -332,11 +292,9 @@ function smarty_function_html_select_date($params, &$smarty)
                 $year_result .= ' ' . $year_extra;
             }
             $year_result .= $extra_attrs . '>'."\n";
-       
-            
             $year_result .= smarty_function_html_options(array('output' => $years,
                                                                'values' => $yearvals,
-                                                               'selected'   => $year_selected != null ? $year_selected :$time[0],
+                                                               'selected'   => $time[0],
                                                                'print_result' => false),
                                                          $smarty);
             $year_result .= '</select>';
@@ -360,7 +318,7 @@ function smarty_function_html_select_date($params, &$smarty)
                 break;
         }
         // Add the field seperator
-        if($i != 2) {
+        if($i < $field_separator_count) {
             $html_result .= $field_separator;
         }
     }

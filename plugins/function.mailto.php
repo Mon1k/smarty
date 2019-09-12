@@ -28,7 +28,6 @@
  *         - newsgroups = (optional) newsgroup(s) to post to
  *         - followupto = (optional) address(es) to follow up to
  *         - extra = (optional) extra tags for the href link
- *         - onlyemail = если есть и true то в hex не шифруется текст
  *
  * Examples:
  * <pre>
@@ -82,7 +81,6 @@ function smarty_function_mailto($params, &$smarty)
 
             case 'extra':
             case 'text':
-            case 'onlyemail':
                 $$var = $value;
 
             default:
@@ -139,27 +137,17 @@ function smarty_function_mailto($params, &$smarty)
             return;
         }
         $address_encode = '';
-        $len = strlen($address);
-        for ($x=0; $x < $len; $x++) {
+        for ($x=0; $x < strlen($address); $x++) {
             if(preg_match('!\w!',$address[$x])) {
                 $address_encode .= '%' . bin2hex($address[$x]);
             } else {
                 $address_encode .= $address[$x];
             }
         }
-        
-        if (!isset($onlyemail) || !$onlyemail)
-        {
-            $text_encode = '';
-            $len = strlen($text);
-            for ($x=0; $x < $len; $x++) 
-            {
-                $text_encode .= '&#x' . bin2hex($text[$x]).';';
-            }
+        $text_encode = '';
+        for ($x=0; $x < strlen($text); $x++) {
+            $text_encode .= '&#x' . bin2hex($text[$x]).';';
         }
-        else
-            $text_encode = $text;
-            
 
         $mailto = "&#109;&#97;&#105;&#108;&#116;&#111;&#58;";
         return '<a href="'.$mailto.$address_encode.'" '.$extra.'>'.$text_encode.'</a>';

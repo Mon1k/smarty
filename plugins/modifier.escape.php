@@ -23,10 +23,10 @@ function smarty_modifier_escape($string, $esc_type = 'html', $char_set = 'ISO-88
 {
     switch ($esc_type) {
         case 'html':
-            return htmlspecialchars2($string, ENT_QUOTES, $char_set);
+            return htmlspecialchars($string, ENT_QUOTES, $char_set);
 
         case 'htmlall':
-            return htmlentities2($string, ENT_QUOTES, $char_set);
+            return htmlentities($string, ENT_QUOTES, $char_set);
 
         case 'url':
             return rawurlencode($string);
