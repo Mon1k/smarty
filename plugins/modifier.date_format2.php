@@ -30,7 +30,11 @@ function smarty_modifier_date_format2($timestamp, $format = 'd.m.Y', $defaultDat
         $timestamp = $defaultDate;
     }
 
-    $date = date($format, $timestamp);
+    if (strpos($timestamp, '.') !== false) {
+        $date = date_create_from_format('U.u', $timestamp)->format($format);
+    } else {
+        $date = date($format, $timestamp);
+    }
 
     if (!$induce) {
         $date = str_replace(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], [
